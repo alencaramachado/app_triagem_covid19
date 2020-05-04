@@ -1,0 +1,33 @@
+CREATE DATABASE covid191;
+
+CREATE TABLE public.usuario (
+    id_usuario serial UNIQUE,
+    nome character varying(100) NOT NULL,
+    email character varying(50) unique,
+    senha character varying(400) NOT NULL,
+    data_cadastro date,
+    ativo boolean,
+	primary key (id_usuario))
+
+	CREATE TABLE public.permissao (
+        id_permissao serial UNIQUE,
+        nome_permissao character varying(50)
+    );
+
+    CREATE TABLE public.usuario_permissao (
+        id serial UNIQUE,
+        id_usuario integer,
+        id_permissao integer,
+    	 FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+         FOREIGN KEY (id_permissao) REFERENCES permissao(id_permissao)
+    );
+
+    CREATE TABLE paciente (
+            id_paciente serial UNIQUE,
+            id_usuario integer,
+            FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+            primary key (id_paciente)
+            )
+
+             ALTER TABLE paciente
+                ADD cartaosus varchar(10) not null default 'CTX1234';
