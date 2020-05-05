@@ -1,13 +1,46 @@
 package br.ufsm.csi.model;
 
-public class Paciente extends Usuario {
+public class Paciente {
 
-    public Paciente( String nome, String email, String senha, boolean ativo, Permissao permissao) {
-        super(nome, email, senha, ativo, permissao);
+    private int id;
+    private String cartaoSus;
+    private Usuario usuario;
+
+
+
+    public Paciente(int id, Usuario usuario, String cartaoSus) {
+      this.setId(id);
+      this.setUsuario(usuario);
+      this.setCartaoSus(cartaoSus);
     }
 
     public Paciente(Usuario usuario){
-        super(usuario.getId(),usuario.getNome(), usuario.getEmail(), usuario.getSenha(), usuario.isAtivo(), usuario.getPermissao());
+            setUsuario(usuario);
     }
 
+
+    public int getId() {
+        return id;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCartaoSus() {
+        return cartaoSus;
+    }
+
+    public void setCartaoSus(String cartaoSus) {
+        this.cartaoSus = cartaoSus;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }

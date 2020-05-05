@@ -81,6 +81,44 @@ public class UsuarioDAO {
         return usuarios;
     }
 
+    public Usuario getUsuario(int id){
+       Usuario usuario = new Usuario();
+
+        //try-with-resources java 7
+        try(Connection connection = new ConectaDB().getConexao()){
+
+            //select * from usuario us, permissao pe, usuario_permissao up
+            //where us.id_usuario = up.id_usuario and pe.id_permissao = up.id_permissao
+
+            this.sql = "SELECT * FROM usuario us, permissao pe, usuario_permissao up " +
+                    " WHERE us.id_usuario = up.id_usuario and pe.id_permissao = up.id_permissao and us.id_usuario = ?";
+            this.preparedStatement = connection.prepareStatement(this.sql);
+            this.preparedStatement.setInt(1, id);
+
+            this.resultSet = this.preparedStatement.executeQuery();
+
+            while ( this.resultSet.next()){
+
+                usuario.setId( this.resultSet.getInt("id_usuario"));
+                usuario.setNome( this.resultSet.getString("nome"));
+                usuario.setEmail( this.resultSet.getString("email"));
+                usuario.setAtivo( this.resultSet.getBoolean("ativo"));
+                usuario.setSenha(this.resultSet.getString("senha"));
+
+                Permissao permissao = new Permissao();
+                permissao.setId(this.resultSet.getInt("id_permissao"));
+                permissao.setNome(this.resultSet.getString("nome_permissao"));
+                usuario.setPermissao(permissao);
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return usuario;
+    }
+
+
 
     public String cadastrar(Usuario usuario){
 
@@ -146,8 +184,20 @@ public class UsuarioDAO {
     }
 
 
-    public String atualizar(Usuario usuario){
-        return null;
+    public String editar(Usuario usuario, Connection conexao) throws SQLException{
+        System.out.println("update usuario ...1");
+        this.sql = " UPDATE usuario SET nome =?, email = ?, senha =? WHERE id_usuario =? ";
+        this.preparedStatement = conexao.prepareStatement(this.sql);
+        this.preparedStatement.setString(1, usuario.getNome());
+        this.preparedStatement.setString(2, usuario.getEmail());
+        this.preparedStatement.setString(3, usuario.getSenha());
+        this.preparedStatement.setInt(4, usuario.getId());
+        this.preparedStatement.executeUpdate();
+
+        if(this.preparedStatement.getUpdateCount() > 0){
+            this.status = "OK";
+        }
+        return this.status;
     }
 
     public String deletar(Usuario usuario){

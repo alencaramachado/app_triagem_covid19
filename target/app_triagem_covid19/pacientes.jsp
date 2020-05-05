@@ -17,9 +17,25 @@
 
     <form action="paciente-controller" method="post">
 
-        Nome: <input type="text" name="nome" /> <br />
-        E-mail: <input type="email" name="email"/> <br />
-        Senha: <input type="password" name="senha"/> <br />
+        <c:choose>
+            <c:when test="${paciente.id != null}">
+                <h1>Editar Paciente</h1>
+                <input type="hidden" name="idpaciente" value="${paciente.id}" />
+                <input type="hidden" name="idusuario" value="${paciente.usuario.id}"/>
+            </c:when>
+            <c:otherwise>
+                <h1>Adicionar Paciente</h1>
+                <input type="hidden" name="idpaciente" value="0" />
+            </c:otherwise>
+        </c:choose>
+
+        Nome: <input type="text" name="nome" value="${paciente.usuario.nome}" /> <br />
+
+        E-mail: <input type="email" name="email" value="${paciente.usuario.email}"/> <br />
+        Cartao Sus: <input type="text" name="cartaosus" value="${paciente.cartaoSus}"/> <br />
+        Senha: <input type="password" name="senha" value="${paciente.usuario.senha}"/> <br />
+
+        <input type="hidden" name="opcao" value="gravar" />
         <input type="submit" value="GRAVAR" />
     </form>
 
@@ -32,14 +48,16 @@
     <tr>
         <th>Nome</th>
         <th>Email</th>
+        <th>Cartão Sus</th>
         <th>Ações</th>
     </tr>
     <c:forEach var="p" items="${pacientes}">
 
-        <c:if test="${p.ativo != false}">
+        <c:if test="${p.usuario.ativo != false}">
             <tr>
-                <td>${p.nome}</td>
-                <td>${p.email}</td>
+                <td>${p.usuario.nome}</td>
+                <td>${p.usuario.email}</td>
+                <td>${p.cartaoSus}</td>
                 <td>
                     <a href="http://localhost:8080/app_triagem_covid19/paciente-controller?opcao=excluir&&id=${p.id}">Excluir</a>
                     <a href="http://localhost:8080/app_triagem_covid19/paciente-controller?opcao=editar&&id=${p.id}">Editar</a>

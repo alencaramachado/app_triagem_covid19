@@ -33,20 +33,38 @@ public class PacienteController extends HttpServlet {
 
 
         }else  if(opcao.equals("editar")){
-            String id = req.getParameter("id");
+            int id = Integer.parseInt(req.getParameter("id"));
             System.out.println("id paciente editar: "+id);
+            Paciente paciente = new PacienteDAO().getPaciente(id);
 
-            // editar paciente ... implementar metodo no PacienteDAO
-            retorno = dao.editar(null);
+            req.setAttribute("paciente", paciente);
 
         }else {
+
+
             String nome = req.getParameter("nome");
             String email = req.getParameter("email");
             String senha = req.getParameter("senha");
+            String cartaosus = req.getParameter("cartaosus");
+
             Permissao p = new Permissao(3, "PACIENTE");
             Usuario usuario = new Usuario(nome,email,senha,true, p);
-            Paciente paciente = new Paciente(usuario);
-            retorno = dao.cadastrar(paciente);
+            int id = Integer.parseInt(req.getParameter("idpaciente"));
+
+            if(id > 0){
+                usuario.setId( Integer.parseInt(req.getParameter("idusuario")) );
+                Paciente paciente = new Paciente(id, usuario, cartaosus);
+                retorno = dao.editar(paciente);
+
+            }else{
+                Paciente paciente = new Paciente(usuario);
+                paciente.setCartaoSus(cartaosus);
+                System.out.println("vai cadastrar paciente ...");
+                retorno = dao.cadastrar(paciente);
+            }
+
+
+            ;
 
         }
 

@@ -41,6 +41,8 @@ public class PacienteDAO {
                 permissao.setNome(this.resultSet.getString("nome_permissao"));
                 usuario.setPermissao(permissao);
                 Paciente p = new Paciente(usuario);
+                p.setCartaoSus(this.resultSet.getString("cartaosus"));
+                p.setId(this.resultSet.getInt("id_paciente"));
                 pacientes.add(p);
 
             }
@@ -55,6 +57,8 @@ public class PacienteDAO {
     }
 
 
+    // refatorar para somente trabalhar com a tabela paciente
+    // colocar codigo q trabalha com a tabela usuario em UsuarioDAO
     public String cadastrar(Paciente paciente){
 
         try(Connection connection = new ConectaDB().getConexao()){
@@ -66,17 +70,18 @@ public class PacienteDAO {
                     " VALUES (?, ?, ?, CURRENT_DATE, ?)";
 
             this.preparedStatement = connection.prepareStatement(this.sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            this.preparedStatement.setString(1, paciente.getNome());
-            this.preparedStatement.setString(2, paciente.getEmail());
-            this.preparedStatement.setString(3, paciente.getSenha());
-            this.preparedStatement.setBoolean(4, paciente.isAtivo());
+            this.preparedStatement.setString(1, paciente.getUsuario().getNome());
+            this.preparedStatement.setString(2, paciente.getUsuario().getEmail());
+            this.preparedStatement.setString(3, paciente.getUsuario().getSenha());
+            this.preparedStatement.setBoolean(4, paciente.getUsuario().isAtivo());
 
             this.preparedStatement.execute();
             this.resultSet = this.preparedStatement.getGeneratedKeys();
             this.resultSet.next();
 
             if(this.resultSet.getInt(1) > 0){
-                paciente.setId(this.resultSet.getInt(1));
+                paciente.getUsuario().setId(this.resultSet.getInt(1));
+                //paciente.setId(this.resultSet.getInt(1));
                 this.status = "OK";
                 System.out.println("dentro do if insert usuario");
             }
@@ -86,8 +91,8 @@ public class PacienteDAO {
                 this.sql = " INSERT INTO usuario_permissao (id_usuario, id_permissao) " +
                         " VALUES (?,?)";
                 this.preparedStatement = connection.prepareStatement(this.sql, PreparedStatement.RETURN_GENERATED_KEYS);
-                this.preparedStatement.setInt(1, paciente.getId());
-                this.preparedStatement.setInt(2, paciente.getPermissao().getId());
+                this.preparedStatement.setInt(1, paciente.getUsuario().getId());
+                this.preparedStatement.setInt(2, paciente.getUsuario().getPermissao().getId());
                 this.preparedStatement.execute();
                 this.resultSet = this.preparedStatement.getGeneratedKeys();
                 this.resultSet.next();
@@ -100,32 +105,86 @@ public class PacienteDAO {
 
 
                 if(this.status.equals("OK")){
-                    this.sql = " INSERT INTO paciente (id_usuario) " +
-                            " VALUES (?)";
+                    this.sql = " INSERT INTO paciente (id_usuario, cartaosus) " +
+                            " VALUES (?, ?)";
                     this.preparedStatement = connection.prepareStatement(this.sql);
-                    this.preparedStatement.setInt(1, paciente.getId());
+                    this.preparedStatement.setInt(1, paciente.getUsuario().getId());
+                    this.preparedStatement.setString(2, paciente.getCartaoSus());
                     boolean retorno = this.preparedStatement.execute();
                     connection.commit();
                 }
+
 
 
             }
 
         }catch(SQLException e){
             e.printStackTrace();
-            this.status = "problemas";
+            this.status = "erro";
         }
 
         return this.status;
     }
 
     public String editar(Paciente p){
-        return "";
+
+        try(Connection connection = new ConectaDB().getConexao()){
+
+            connection.setAutoCommit(false);
+
+            String retorno = new UsuarioDAO().editar(p.getUsuario(), connection);
+            if(retorno.equals("OK")){
+
+                this.sql = "UPDATE paciente SET cartaosus = ? WHERE id_paciente = ?";
+                this.preparedStatement = connection.prepareStatement(this.sql);
+                this.preparedStatement.setString(1, p.getCartaoSus());
+                this.preparedStatement.setInt(2, p.getId());
+                this.preparedStatement.executeUpdate();
+
+                if(this.preparedStatement.getUpdateCount() > 0){
+                    this.status = "OK";
+                    connection.commit();
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            this.status = "OK";
+        }
+
+        return this.status;
     }
 
 
     public String excluir(Paciente p){
         return "";
+    }
+
+    public Paciente getPaciente(int id){
+        Paciente p = null;
+
+        try (Connection connection = new ConectaDB().getConexao()){
+
+            this.sql = "SELECT * FROM paciente WHERE id_paciente = ?";
+            this.preparedStatement = connection.prepareStatement(this.sql);
+            this.preparedStatement.setInt(1, id);
+            this.resultSet = this.preparedStatement.executeQuery();
+
+            while (this.resultSet.next()){
+
+                String cartaoSus = this.resultSet.getString("cartaosus");
+                int id_usuario = this.resultSet.getInt("id_usuario");
+
+                p = new Paciente(id, new UsuarioDAO().getUsuario(id_usuario), cartaoSus);
+            }
+
+
+
+        }catch (SQLException e){
+            e.printStackTrace();
+            this.status = "erro";
+        }
+
+        return p;
     }
 
 }

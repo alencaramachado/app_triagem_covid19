@@ -17,9 +17,6 @@ public class TestePaciente {
         PacienteDAO dao = new PacienteDAO();
         dao.cadastrar(paciente);
 
-        for(Paciente pa : dao.getPacientes()){
-            System.out.println("nome: "+pa.getNome());
-        }
 
 
     }
