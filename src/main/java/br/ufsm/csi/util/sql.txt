@@ -31,3 +31,21 @@ CREATE TABLE public.usuario (
 
              ALTER TABLE paciente
                 ADD cartaosus varchar(10) not null default 'CTX1234';
+
+                CREATE TABLE agente_saude (
+                         id_agente_saude serial UNIQUE,
+                         id_usuario integer,
+                 	 	especialidade varchar(30) not null,
+                         FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+                         primary key (id_agente_saude)
+                         )
+                     INSERT INTO usuario(nome, email, senha, data_cadastro, ativo)
+                     VALUES ('Weibo', 'weibo@teste', 'teste', CURRENT_DATE, 'true')
+                     select * from usuario
+                     select * from permissao
+
+                     INSERT INTO usuario_permissao (id_usuario, id_permissao)
+                     VALUES (24,3)
+
+                     INSERT INTO agente_saude(id_usuario, especialidade)
+                     VALUES (24,'CLINICO')
