@@ -40,9 +40,13 @@ public class PacienteDAO {
                 permissao.setId(this.resultSet.getInt("id_permissao"));
                 permissao.setNome(this.resultSet.getString("nome_permissao"));
                 usuario.setPermissao(permissao);
-                Paciente p = new Paciente(usuario);
-                p.setCartaoSus(this.resultSet.getString("cartaosus"));
-                p.setId(this.resultSet.getInt("id_paciente"));
+
+                int idpaciente = this.resultSet.getInt("id_paciente");
+                String cartaoSus = this.resultSet.getString("cartaosus");
+                int idade = this.resultSet.getInt("idade");
+                Paciente p = new Paciente(idpaciente, usuario, cartaoSus, idade);
+
+
                 pacientes.add(p);
 
             }
@@ -105,11 +109,12 @@ public class PacienteDAO {
 
 
                 if(this.status.equals("OK")){
-                    this.sql = " INSERT INTO paciente (id_usuario, cartaosus) " +
-                            " VALUES (?, ?)";
+                    this.sql = " INSERT INTO paciente (id_usuario, cartaosus, idade) " +
+                            " VALUES (?, ?, ?)";
                     this.preparedStatement = connection.prepareStatement(this.sql);
                     this.preparedStatement.setInt(1, paciente.getUsuario().getId());
                     this.preparedStatement.setString(2, paciente.getCartaoSus());
+                    this.preparedStatement.setInt(3,paciente.getIdade());
                     boolean retorno = this.preparedStatement.execute();
                     connection.commit();
                 }
@@ -135,10 +140,11 @@ public class PacienteDAO {
             String retorno = new UsuarioDAO().editar(p.getUsuario(), connection);
             if(retorno.equals("OK")){
 
-                this.sql = "UPDATE paciente SET cartaosus = ? WHERE id_paciente = ?";
+                this.sql = "UPDATE paciente SET cartaosus = ?, idade = ? WHERE id_paciente = ?";
                 this.preparedStatement = connection.prepareStatement(this.sql);
                 this.preparedStatement.setString(1, p.getCartaoSus());
-                this.preparedStatement.setInt(2, p.getId());
+                this.preparedStatement.setInt(2, p.getIdade());
+                this.preparedStatement.setInt(3, p.getId());
                 this.preparedStatement.executeUpdate();
 
                 if(this.preparedStatement.getUpdateCount() > 0){
@@ -173,8 +179,9 @@ public class PacienteDAO {
 
                 String cartaoSus = this.resultSet.getString("cartaosus");
                 int id_usuario = this.resultSet.getInt("id_usuario");
+                int idade = this.resultSet.getInt("idade");
 
-                p = new Paciente(id, new UsuarioDAO().getUsuario(id_usuario), cartaoSus);
+                p = new Paciente(id, new UsuarioDAO().getUsuario(id_usuario), cartaoSus, idade);
             }
 
 

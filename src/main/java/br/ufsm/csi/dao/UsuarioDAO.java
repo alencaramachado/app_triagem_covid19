@@ -15,6 +15,31 @@ public class UsuarioDAO {
     private PreparedStatement preparedStatement;
     private String status;
 
+
+    public Usuario autenticar (String email, String senha){
+
+        System.out.println("autenticar .... ");
+        try(Connection connection = new ConectaDB().getConexao()){
+
+            this.sql = "SELECT id_usuario FROM usuario WHERE email = ? AND senha = ? ";
+            this.preparedStatement = connection.prepareStatement(this.sql);
+            this.preparedStatement.setString(1, email);
+            this.preparedStatement.setString(2, senha);
+            this.resultSet = this.preparedStatement.executeQuery();
+            System.out.println("vai executar a consulta "+this.resultSet);
+            while (this.resultSet.next()){
+                System.out.println("id_usuario = "+this.resultSet.getInt("id_usuario"));
+                return getUsuario(this.resultSet.getInt("id_usuario"));
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
+
+        return null;
+    }
+
     public ArrayList<Usuario> getUsuariosSemPermissao(){
         ArrayList<Usuario> usuarios = new ArrayList<Usuario>();
 
@@ -109,6 +134,7 @@ public class UsuarioDAO {
                 permissao.setId(this.resultSet.getInt("id_permissao"));
                 permissao.setNome(this.resultSet.getString("nome_permissao"));
                 usuario.setPermissao(permissao);
+
             }
 
         }catch (SQLException e){

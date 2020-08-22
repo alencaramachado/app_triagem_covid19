@@ -20,56 +20,67 @@ public class PacienteController extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        PacienteDAO dao = new PacienteDAO();
-        String retorno = "";
-        String opcao = req.getParameter("opcao");
+        String uri = "/";
 
-        if(opcao.equals("excluir")){
-            String id = req.getParameter("id");
-            System.out.println("id paciente excluir: "+id);
+       // if(req.getSession().getAttribute("logado") != null){
 
-            // excluir paciente ... implementar metodo no PacienteDAO
-            retorno = dao.excluir(null);
+            PacienteDAO dao = new PacienteDAO();
+            String retorno = "";
+            String opcao = req.getParameter("opcao");
 
+            if(opcao.equals("excluir")){
+                String id = req.getParameter("id");
+                System.out.println("id paciente excluir: "+id);
 
-        }else  if(opcao.equals("editar")){
-            int id = Integer.parseInt(req.getParameter("id"));
-            System.out.println("id paciente editar: "+id);
-            Paciente paciente = new PacienteDAO().getPaciente(id);
-
-            req.setAttribute("paciente", paciente);
-
-        }else {
+                // excluir paciente ... implementar metodo no PacienteDAO
+                retorno = dao.excluir(null);
 
 
-            String nome = req.getParameter("nome");
-            String email = req.getParameter("email");
-            String senha = req.getParameter("senha");
-            String cartaosus = req.getParameter("cartaosus");
+            }else  if(opcao.equals("editar")){
+                int id = Integer.parseInt(req.getParameter("id"));
+                System.out.println("id paciente editar: "+id);
+                Paciente paciente = new PacienteDAO().getPaciente(id);
 
-            Permissao p = new Permissao(3, "PACIENTE");
-            Usuario usuario = new Usuario(nome,email,senha,true, p);
-            int id = Integer.parseInt(req.getParameter("idpaciente"));
+                req.setAttribute("paciente", paciente);
 
-            if(id > 0){
-                usuario.setId( Integer.parseInt(req.getParameter("idusuario")) );
-                Paciente paciente = new Paciente(id, usuario, cartaosus);
-                retorno = dao.editar(paciente);
+            }else {
 
-            }else{
-                Paciente paciente = new Paciente(usuario);
-                paciente.setCartaoSus(cartaosus);
-                System.out.println("vai cadastrar paciente ...");
-                retorno = dao.cadastrar(paciente);
+
+                String nome = req.getParameter("nome");
+                String email = req.getParameter("email");
+                String senha = req.getParameter("senha");
+                String cartaosus = req.getParameter("cartaosus");
+                int idade = Integer.parseInt(req.getParameter("idade"));
+
+
+                Permissao p = new Permissao(3, "PACIENTE");
+                Usuario usuario = new Usuario(nome,email,senha,true, p);
+                int id = Integer.parseInt(req.getParameter("idpaciente"));
+
+                if(id > 0){
+                    usuario.setId( Integer.parseInt(req.getParameter("idusuario")) );
+                    Paciente paciente = new Paciente(id, usuario, cartaosus, idade);
+                    retorno = dao.editar(paciente);
+
+                }else{
+                    Paciente paciente = new Paciente(usuario);
+                    paciente.setCartaoSus(cartaosus);
+                    paciente.setIdade(idade);
+                    System.out.println("vai cadastrar paciente ...");
+                    retorno = dao.cadastrar(paciente);
+                }
+
+
             }
+            req.setAttribute("retorno", retorno);
+            uri = "WEB-INF/jsp/pacientes.jsp";
+            req.setAttribute("pacientes", new PacienteDAO().getPacientes());
+      //  }
 
 
-            ;
 
-        }
 
-        req.setAttribute("retorno", retorno);
-        RequestDispatcher rd = req.getRequestDispatcher("/");
+        RequestDispatcher rd = req.getRequestDispatcher(uri);
         rd.forward(req, resp);
 
 

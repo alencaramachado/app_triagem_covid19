@@ -49,3 +49,22 @@ CREATE TABLE public.usuario (
 
                      INSERT INTO agente_saude(id_usuario, especialidade)
                      VALUES (24,'CLINICO')
+
+                    ALTER TABLE paciente ADD idade integer
+
+                     CREATE TABLE check_sintomas (
+                     		id_sintoma serial UNIQUE,
+                          	id_paciente integer,
+                          	id_agente_saude integer,
+                          	temperatura float,
+                          	tosse boolean,
+                          	catarro boolean,
+                          	rouquidao boolean,
+                          	dor_garganta boolean,
+                          	nariz_entupido boolean,
+                          	data_avaliacao date,
+                          	dias_sintomas integer,
+                          	FOREIGN KEY (id_paciente) REFERENCES paciente(id_paciente),
+                          	FOREIGN KEY (id_agente_saude) REFERENCES agente_saude(id_agente_saude),
+                          	PRIMARY KEY (id_sintoma)
+                     )

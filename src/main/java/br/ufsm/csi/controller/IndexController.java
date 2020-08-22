@@ -18,9 +18,7 @@ public class IndexController extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("index ....");
 
-
-        req.setAttribute("pacientes", new PacienteDAO().getPacientes());
-        RequestDispatcher rd = req.getRequestDispatcher("/pacientes.jsp");
+        RequestDispatcher rd = req.getRequestDispatcher("WEB-INF/jsp/login.jsp");
         rd.forward(req, resp);
 
 

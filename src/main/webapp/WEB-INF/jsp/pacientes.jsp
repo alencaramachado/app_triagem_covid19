@@ -14,6 +14,10 @@
     <title>Pacientes</title>
 </head>
 <body>
+    <a href="controlador?opcao=dashbord">VOLTAR</a>
+
+    <h5>Olá ${logado.nome}</h5>
+    <h5>ID da sessão: ${pageContext.session.id}</h5>
 
     <form action="paciente-controller" method="post">
 
@@ -33,6 +37,7 @@
 
         E-mail: <input type="email" name="email" value="${paciente.usuario.email}"/> <br />
         Cartao Sus: <input type="text" name="cartaosus" value="${paciente.cartaoSus}"/> <br />
+        Idade: <input type="number" name="idade" value="${paciente.idade}"/> <br />
         Senha: <input type="password" name="senha" value="${paciente.usuario.senha}"/> <br />
 
         <input type="hidden" name="opcao" value="gravar" />
@@ -49,6 +54,7 @@
         <th>Nome</th>
         <th>Email</th>
         <th>Cartão Sus</th>
+        <th>Idade</th>
         <th>Ações</th>
     </tr>
     <c:forEach var="p" items="${pacientes}">
@@ -58,6 +64,7 @@
                 <td>${p.usuario.nome}</td>
                 <td>${p.usuario.email}</td>
                 <td>${p.cartaoSus}</td>
+                <td>${p.idade}</td>
                 <td>
                     <a href="http://localhost:8080/app_triagem_covid19/paciente-controller?opcao=excluir&&id=${p.id}">Excluir</a>
                     <a href="http://localhost:8080/app_triagem_covid19/paciente-controller?opcao=editar&&id=${p.id}">Editar</a>
